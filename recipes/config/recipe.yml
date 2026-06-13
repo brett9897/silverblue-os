@@ -14,6 +14,5 @@ modules:
 
   # 2. Ensure system flatpaks update cleanly
   - type: default-flatpaks
-    notify: true
-    system:
-      install: []
+    configurations:
+        - notify: true
