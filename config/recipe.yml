@@ -1,0 +1,59 @@
+name: my-surface-os
+description: Personal Fedora Silverblue image optimized for Microsoft Surface.
+
+base-image: ghcr.io/ublue-os/bazzite-gnome-nvidia
+image-version: 44
+
+modules:
+  # 1. Manage native packages via rpm-ostree
+  - type: rpm-ostree
+    repos:
+      # Add the official Google Chrome repository
+      - https://dl.google.com/linux/chrome/rpm/stable/x86_64
+    install:
+      - vimname: Build and Push Custom OS Image
+on:
+  schedule:
+    - cron: "0 0 * * 1" # Automatically rebuild every Monday at midnight to pull latest security patches
+  push:
+    branches:
+      - main
+    paths:
+      - 'config/**'
+      - '.github/workflows/**'
+  workflow_dispatch: # Allows you to manually click "Run Workflow" in the GitHub UI
+
+env:
+  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
+
+jobs:
+  bluebuild:
+    name: Build Custom Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      # Use the official BlueBuild compiler tool
+      - name: Build Custom Image
+        uses: blue-build/github-action@v1
+        with:
+          recipe: 'config/recipe.yml'
+          cosign_private_key: ${{ secrets.SIGNING_SECRET }}
+          registry_token: ${{ github.token }}
+          prune: true
+      - google-chrome-stable
+      - gnome-shell-extension-appindicator
+    remove:
+      - firefox
+      - firefox-langpacks
+
+  # 2. Ensure system flatpaks update cleanly
+  - type: default-flatpaks
+    notify: true
+    system:
+      install:
+        - com.slack.Slack
+        - be.alexandervanhee.gradia
+      remove: []
