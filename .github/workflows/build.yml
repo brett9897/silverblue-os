@@ -22,10 +22,30 @@ jobs:
       packages: write
       id-token: write
     steps:
-      # Use the official BlueBuild compiler tool
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Diagnostic - Check Secret Visibility
+        run: |
+          if [ -z "${{ secrets.SIGNING_SECRET }}" ]; then
+            echo "❌ ERROR: The SIGNING_SECRET is completely empty. GitHub Actions cannot see it."
+            exit 1
+          else
+            echo "✅ SUCCESS: The secret is securely populated."
+          fi
+
+      - name: Diagnostic - Check Public Key
+        run: |
+          if [ ! -f "cosign.pub" ]; then
+            echo "❌ ERROR: cosign.pub is missing from the root of the repository."
+            exit 1
+          else
+            echo "✅ SUCCESS: cosign.pub found."
+          fi
+
       - name: Build Custom Image
         uses: blue-build/github-action@v1
         with:
           recipe: 'config/recipe.yml'
-          registry_token: ${{ github.token }}
           cosign_private_key: ${{ secrets.SIGNING_SECRET }}
+          registry_token: ${{ github.token }}
