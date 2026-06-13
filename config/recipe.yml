@@ -11,40 +11,10 @@ modules:
       # Add the official Google Chrome repository
       - https://dl.google.com/linux/chrome/rpm/stable/x86_64
     install:
-      - vimname: Build and Push Custom OS Image
-on:
-  schedule:
-    - cron: "0 0 * * 1" # Automatically rebuild every Monday at midnight to pull latest security patches
-  push:
-    branches:
-      - main
-    paths:
-      - 'config/**'
-      - '.github/workflows/**'
-  workflow_dispatch: # Allows you to manually click "Run Workflow" in the GitHub UI
-
-env:
-  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
-
-jobs:
-  bluebuild:
-    name: Build Custom Image
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    steps:
-      # Use the official BlueBuild compiler tool
-      - name: Build Custom Image
-        uses: blue-build/github-action@v1
-        with:
-          recipe: 'config/recipe.yml'
-          cosign_private_key: ${{ secrets.SIGNING_SECRET }}
-          registry_token: ${{ github.token }}
-          prune: true
+      - vim
       - google-chrome-stable
       - gnome-shell-extension-appindicator
+      - chezmoi
     remove:
       - firefox
       - firefox-langpacks
