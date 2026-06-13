@@ -2,7 +2,7 @@ name: my-surface-os
 description: Personal Fedora Silverblue image optimized for Microsoft Surface.
 
 base-image: ghcr.io/ublue-os/bazzite-gnome-nvidia
-image-version: 44
+image-version: latest
 
 modules:
   # 1. Manage native packages via rpm-ostree
