@@ -4,7 +4,7 @@ on:
     - cron: "0 0 * * 1" # Automatically rebuild every Monday at midnight to pull latest security patches
   push:
     branches:
-      - main
+      - master
     paths:
       - 'config/**'
       - '.github/workflows/**'
